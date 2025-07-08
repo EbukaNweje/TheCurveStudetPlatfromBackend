@@ -2,13 +2,15 @@ const Assessment = require("../models/Assessment");
 
 exports.createAssessment = async (req, res) => {
   try {
-    const { github } = req.body;
+    const github = req.body.github?.trim();
+    const name = req.body.name?.trim() || "Untitled Assessment";
 
     if (!github) {
       return res.status(400).json({ message: "GitHub link is required" });
     }
 
-    const githubRepoRegex = /^https?:\/\/(www\.)?github\.com\/[\w.-]+\/[\w.-]+(\/)?$/;
+    // Updated regex to allow optional .git and trailing slash
+    const githubRepoRegex = /^https?:\/\/(www\.)?github\.com\/[\w.-]+\/[\w.-]+(\.git)?(\/)?$/;
 
     if (!githubRepoRegex.test(github)) {
       return res.status(400).json({ message: "Invalid GitHub repository link" });
@@ -17,15 +19,10 @@ exports.createAssessment = async (req, res) => {
     const existingAssessment = await Assessment.findOne({ github });
 
     if (existingAssessment) {
-      return res.status(400).json({ message: "Assessment already exists" });
+      return res.status(400).json({ message: "Assessment already exists for this GitHub link" });
     }
 
-    const data = {
-      github,
-      name: req.body.name,
-    };
-
-    const assessment = await Assessment.create(data);
+    const assessment = await Assessment.create({ github, name });
 
     return res.status(201).json({
       message: "Assessment created successfully",
@@ -34,9 +31,10 @@ exports.createAssessment = async (req, res) => {
 
   } catch (err) {
     console.error("Error creating assessment:", err);
-    return res.status(500).send({ message: "Server error", error: err });
+    return res.status(500).json({ message: "Internal server error", error: err.message });
   }
 };
+
 
 exports.getAssessment = async (req, res) => {
   try {
