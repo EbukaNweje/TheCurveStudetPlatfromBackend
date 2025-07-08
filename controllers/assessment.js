@@ -25,7 +25,7 @@ exports.createAssessment = async (req, res) => {
     const assessment = await Assessment.create({ github, name });
 
     return res.status(201).json({
-      message: "Assessment created successfully",
+      message: "Assessment Submitted successfully",
       assessment,
     });
 
