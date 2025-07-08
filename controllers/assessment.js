@@ -1,0 +1,65 @@
+const Assessment = require("../models/Assessment");
+
+exports.createAssessment = async (req, res) => {
+  try {
+    const { github } = req.body;
+
+    if (!github) {
+      return res.status(400).json({ message: "GitHub link is required" });
+    }
+
+    const githubRepoRegex = /^https?:\/\/(www\.)?github\.com\/[\w.-]+\/[\w.-]+(\/)?$/;
+
+    if (!githubRepoRegex.test(github)) {
+      return res.status(400).json({ message: "Invalid GitHub repository link" });
+    }
+
+    const existingAssessment = await Assessment.findOne({ github });
+
+    if (existingAssessment) {
+      return res.status(400).json({ message: "Assessment already exists" });
+    }
+
+    const data = {
+      github,
+      name: req.body.name,
+    };
+
+    const assessment = await Assessment.create(data);
+
+    return res.status(201).json({
+      message: "Assessment created successfully",
+      assessment,
+    });
+
+  } catch (err) {
+    console.error("Error creating assessment:", err);
+    return res.status(500).send({ message: "Server error", error: err });
+  }
+};
+
+exports.getAssessment = async (req, res) => {
+  try {
+    const assessments = await Assessment.find();
+    return res.status(200).json(assessments);
+  } catch (err) {
+    console.error("Error fetching assessments:", err);
+    return res.status(500).send({ message: "Server error", error: err });
+  }
+}
+
+exports.approveAssessment = async (req, res) => {
+  try {
+    const { assessmentId } = req.params;
+    const assessment = await Assessment.findById(assessmentId);
+    if (!assessment) {
+      return res.status(404).json({ message: "Assessment not found" });
+    }
+    assessment.status = "approved";
+    await assessment.save();
+    return res.status(200).json({ message: "Assessment approved successfully" });
+  } catch (err) {
+    console.error("Error approving assessment:", err);
+    return res.status(500).send({ message: "Server error", error: err });
+  }
+};
