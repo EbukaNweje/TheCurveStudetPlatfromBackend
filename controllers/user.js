@@ -8,7 +8,7 @@ exports.getOneUser = async (req, res) => {
             return res.status(400).json({ message: "Email is required" });
         }
 
-        const user = await User.findOne({ email }).populate("assessment");
+        const user = await User.findOne({email: email }).populate("assessment");
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });

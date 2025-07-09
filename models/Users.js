@@ -1,6 +1,10 @@
 const mongoose = require("mongoose")
 
 const UserSchema = new mongoose.Schema({
+    studentId : {
+        type: String,
+        required: true  
+    },
     name: {
         type: String,
         required: true
