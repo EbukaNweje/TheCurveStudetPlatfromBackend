@@ -78,7 +78,7 @@ exports.approveAssessment = async (req, res) => {
     if (!assessment) {
       return res.status(404).json({ message: "Assessment not found" });
     }
-    assessment.status = "approved";
+    assessment.status = "Approved";
     await assessment.save();
     return res.status(200).json({ message: "Assessment approved successfully" });
   } catch (err) {
