@@ -2,13 +2,15 @@ const User = require("../models/Users");
 
 exports.getOneUser = async (req, res) => {
     try {
-        const { email } = req.query; 
+        const studentId = req.params.studentId; 
 
-        if (!email) {
-            return res.status(400).json({ message: "Email is required" });
+        if (!studentId) {
+            return res.status(400).json({ message: "student Id is required" });
         }
 
-        const user = await User.findOne({email: email }).populate("assessment");
+        const user = await User.findOne({studentId: studentId }).populate("assessment");
+        // console.log(user)
+
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
