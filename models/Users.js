@@ -10,6 +10,11 @@ const UserSchema = new mongoose.Schema({
         required: true
     },
 
+    stack: {
+        type: String,
+        required: true
+    },
+
     assessment: [
         {
             type: mongoose.Schema.Types.ObjectId,

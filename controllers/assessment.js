@@ -6,9 +6,10 @@ exports.createAssessment = async (req, res) => {
     const github = req.body.github?.trim();
     const name = req.body.name?.trim();
     const email = req.body.email?.trim();
+    const stack = req.body.stack?.trim();
 
-    if (!github || !email || !name) {
-      return res.status(400).json({ message: "Name, email, and GitHub link are required." });
+    if (!github || !email || !name || !stack) {
+      return res.status(400).json({ message: "Name, email, stack and GitHub link are required." });
     }
 
     const githubRepoRegex = /^https?:\/\/(www\.)?github\.com\/[\w.-]+\/[\w.-]+(\.git)?(\/)?$/;
@@ -31,6 +32,7 @@ exports.createAssessment = async (req, res) => {
       user = await User.create({
         name,
         email,
+        stack,
         assessment: [assessment._id],
       });
     } else {
