@@ -20,3 +20,13 @@ exports.getOneUser = async (req, res) => {
         return res.status(500).send({ message: "Server error", error: err.message });
     }
 };
+
+exports.getAllUser = async (req, res) => {
+    try {
+        const users = await User.find().populate("assessment");
+        return res.status(200).json(users);
+    } catch (err) {
+        console.error("Error fetching users:", err);
+        return res.status(500).send({ message: "Server error", error: err.message });
+    }
+};
