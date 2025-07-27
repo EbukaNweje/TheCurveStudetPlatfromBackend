@@ -36,13 +36,13 @@ if (!submissionLink) {
       return res.status(400).json({ message: "Invalid link format" });
     }
 
-    const existingAssessment = await Assessment.findOne({ github: submissionLink });
+    const existingAssessment = await Assessment.findOne({ submissionLink: submissionLink });
     if (existingAssessment) {
       return res.status(400).json({ message: "Assessment already exists for this link" });
     }
 
     // Create assessment with general link
-    const assessment = await Assessment.create({ github: submissionLink, name });
+    const assessment = await Assessment.create({ submissionLink: submissionLink, name });
 
     // Find user or create new one
     let user = await User.findOne({ email });
