@@ -23,7 +23,7 @@ const AssessmentSchema = new mongoose.Schema({
       return now.toTimeString().split(" ")[0]; 
     },
   },
-  github: {
+  submissionLink: {
     type: String,
     required: true,
   },

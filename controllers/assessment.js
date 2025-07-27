@@ -3,28 +3,46 @@ const User = require("../models/Users");
 
 exports.createAssessment = async (req, res) => {
   try {
-    const github = req.body.github?.trim();
+    const submissionLink = req.body.submissionLink?.trim(); // or req.body.submissionLink if you rename it in frontend
     const name = req.body.name?.trim();
     const email = req.body.email?.trim();
     const stack = req.body.stack?.trim();
     const studentId = req.body.studentId?.trim();
 
-    if (!github || !email || !name || !studentId || !stack) {
-      return res.status(400).json({ message: "Name, email, stack, studentId and GitHub link are required." });
+   if (!name) {
+  return res.status(400).json({ message: "Name is required." });
+}
+
+if (!email) {
+  return res.status(400).json({ message: "Email is required." });
+}
+
+if (!stack) {
+  return res.status(400).json({ message: "Stack is required." });
+}
+
+if (!studentId) {
+  return res.status(400).json({ message: "Student ID is required." });
+}
+
+if (!submissionLink) {
+  return res.status(400).json({ message: "Submission link is required." });
+}
+
+
+    // Optional: Validate it's a general URL
+    const urlRegex = /^https?:\/\/[^\s$.?#].[^\s]*$/;
+    if (!urlRegex.test(submissionLink)) {
+      return res.status(400).json({ message: "Invalid link format" });
     }
 
-    const githubRepoRegex = /^https?:\/\/(www\.)?github\.com\/[\w.-]+\/[\w.-]+(\.git)?(\/)?$/;
-    if (!githubRepoRegex.test(github)) {
-      return res.status(400).json({ message: "Invalid GitHub repository link" });
-    }
-
-    const existingAssessment = await Assessment.findOne({ github });
+    const existingAssessment = await Assessment.findOne({ github: submissionLink });
     if (existingAssessment) {
-      return res.status(400).json({ message: "Assessment already exists for this GitHub link" });
+      return res.status(400).json({ message: "Assessment already exists for this link" });
     }
 
-    // Create assessment
-    const assessment = await Assessment.create({ github, name });
+    // Create assessment with general link
+    const assessment = await Assessment.create({ github: submissionLink, name });
 
     // Find user or create new one
     let user = await User.findOne({ email });
@@ -42,7 +60,7 @@ exports.createAssessment = async (req, res) => {
       await user.save();
     }
 
-    // Re-fetch user with populated assessment data
+    // Re-fetch user with populated assessments
     const populatedUser = await User.findById(user._id).populate("assessment");
 
     return res.status(201).json({
@@ -56,6 +74,7 @@ exports.createAssessment = async (req, res) => {
     return res.status(500).json({ message: "Internal server error", error: err.message });
   }
 };
+
 
 
 
